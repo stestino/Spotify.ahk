@@ -23,9 +23,10 @@ You will only rarely need to do web authorization thanks to Spotify's refreshabl
 # Personalization Changes 
 
 #### Spotify.AHK
-1. Modified spotify.ahk to not popup/annoy when token refresh fails. Instead, it now silently sleeps and retries.
-2. Replaced API auth, using an app under my own account.
-3. Replaced plain-text base64 auth with secret stored in environment variable.
+1. Limited the OAUTH request scope.
+2. Modified spotify.ahk to not popup/annoy when token refresh fails. Instead, it now silently sleeps and retries.
+3. Replaced API auth, using an app under my own account.
+4. Replaced plain-text base64 auth with secret stored in environment variable.
 
 
 #### Playlist Controls
@@ -37,3 +38,10 @@ Implemented a set of playlist controls to my own personal preference.
 | LShift + Down  | Volume increase by 5%  |
 | LShift + Left  | Volume MUTE |
 | LShift + Right  | Volume MAX  |
+
+## Future Changes / Wishlist
+1. Next Track
+2. Previous Track
+3. Playlist selection 
+4. Re-implement shuffle
+
