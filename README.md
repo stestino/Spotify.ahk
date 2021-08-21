@@ -19,3 +19,20 @@ When you create a new Spotify object for the first time, a Spotify app authoriza
 While you can choose not to authorize Spotify.ahk, all functionality will be lost without valid authorization. 
 
 You will only rarely need to do web authorization thanks to Spotify's refreshable user authorization.
+
+
+#### Spotify.AHK changes
+1. Modified spotify.ahk to not popup/annoy when token refresh fails. Instead, it now silently sleeps and retries.
+2. Replaced API auth, using an app under my own account.
+3. Replaced plain-text base64 auth with secret stored in environment variable.
+
+
+#### Playlist Controls
+Implemented a set of playlist controls to my own personal preference.
+
+| Key Combo  | Action |
+| ------------- | ------------- |
+| LShift + Up  | Volume increase by 5% |
+| LShift + Down  | Volume increase by 5%  |
+| LShift + Left  | Volume MUTE |
+| LShift + Right  | Volume MAX  |
