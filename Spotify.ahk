@@ -1,7 +1,5 @@
 #MaxThreads 2
 class Spotify {
-	static SHOULD_CHECK_CONNECTION_BEFORE_REQUEST := false
-	
 	__New() {
 		this.Util := new Util(this)
 		this.Player := new Player(this)
@@ -43,7 +41,7 @@ class Util {
 			server := new HttpServer()
 			server.SetPaths(paths)
 			server.Serve(8000)
-			Run, % "https://accounts.spotify.com/en/authorize?client_id=9fe26296bb7b4330ac59339efd2742b0&response_type=code&redirect_uri=http:%2F%2Flocalhost:8000%2Fcallback&scope=user-modify-playback-state%20user-read-currently-playing%20user-read-playback-state%20user-library-modify%20user-library-read%20user-read-email%20user-read-private%20user-read-birthdate%20user-follow-read%20user-follow-modify%20playlist-read-private%20playlist-read-collaborative%20playlist-modify-public%20playlist-modify-private%20user-read-recently-played%20user-top-read"
+			Run, % "https://accounts.spotify.com/en/authorize?client_id=f2682a94021445bea0415256ea778cd2&response_type=code&redirect_uri=http://localhost:8000/callback&scope=user-modify-playback-state%20user-read-currently-playing%20user-read-playback-state"
 			loop {
 				Sleep, -1
 			} until (this.WebAuthDone() = true)
@@ -53,11 +51,11 @@ class Util {
 	
 	; Timeout methods
 	
-    SetTimeout(ExpiresInSeconds) {
-        TimeOut := A_Now
-        EnvAdd, TimeOut, %ExpiresInSeconds%, seconds
-        this.TimeOut := TimeOut
-    }
+	SetTimeout() {
+		TimeOut := A_Now
+		EnvAdd, TimeOut, 1, hours
+		this.TimeOut := TimeOut
+	}
 	CheckTimeout() {
 		if (this.TimeLastChecked = A_Min) {
 			return
@@ -71,10 +69,6 @@ class Util {
 	
 	; API token operations
 	
-	IsInternetConnected(CheckURL := "http://api.spotify.com/v1/"){
-		return DllCall("Wininet.dll\InternetCheckConnection", "Str", CheckURL, "UInt", 1, "UInt", 0)
-	}
-	
 	RefreshTempToken(refresh) {
 		refresh := this.DecryptToken(refresh)
 		arg := {1:{1:"Content-Type", 2:"application/x-www-form-urlencoded"}, 2:{1:"Authorization", 2:"Basic OWZlMjYyOTZiYjdiNDMzMGFjNTkzMzllZmQyNzQyYjA6ZWNhNjU2ZDFkNTczNDNhOTllMWJjNWVmODQ0YmY2NGM="}}
@@ -85,7 +79,9 @@ class Util {
 		catch E {
 			if (InStr(E.What, "HTTP response code not 2xx")) {
 				this.AuthRetries++
-				MsgBox, % "Spotify.ahk could not get a valid refresh token from the Spotify API, retrying authorization."
+				; This was annoying so I disabled it and added a sleep instead
+				; MsgBox, % "Spotify.ahk could not get a valid refresh token from the Spotify API, retrying authorization."
+				sleep 2
 				RegWrite, REG_SZ, % this.RefreshLoc, refreshToken, % "" ; Wipe the stored (bad) refresh token
 				return this.StartUp() ; Retry auth and hope we get a valid refresh token this time
 			}
@@ -115,7 +111,7 @@ class Util {
 			; If we got an access token, we can set the flag that we're authorized
 			this.authState := true
 			this.Token := Response["access_token"] ; And store the new access token
-			this.SetTimeout(Response.expires_in) ; And set when the new access token will expire
+			this.SetTimeout() ; And set when the new access token will expire
 		}
 		else {
 			; Else if they didn't give us a new access token, something went wrong
@@ -141,7 +137,7 @@ class Util {
 			return
 		}
 		AHKsock_Close(-1)
-		arg := {1:{1:"Content-Type", 2:"application/x-www-form-urlencoded"}, 2:{1:"Authorization", 2:"Basic OWZlMjYyOTZiYjdiNDMzMGFjNTkzMzllZmQyNzQyYjA6ZWNhNjU2ZDFkNTczNDNhOTllMWJjNWVmODQ0YmY2NGM="}}
+		arg := {1:{1:"Content-Type", 2:"application/x-www-form-urlencoded"}, 2:{1:"Authorization", 2:"Basic ZjI2ODJhOTQwMjE0NDViZWEwNDE1MjU2ZWE3NzhjZDI6MjdiMWU3NDk3ZDJjNDIxYTk4MzgyMjEyYWEyZThjM2Y="}}
 		response := this.CustomCall("POST", "https://accounts.spotify.com/api/token?grant_type=authorization_code&code=" . this.auth . "&redirect_uri=http:%2F%2Flocalhost:8000%2Fcallback", arg, true)
 		RegexMatch(response, "access_token"":""\K.*?(?="")", token)
 		this.token := token
@@ -163,10 +159,6 @@ class Util {
 	; API call method with auto-auth/timeout check/base URL
 	
 	CustomCall(method, url, HeaderArray := "", noTimeOut := false, body := "", noErr := false) {
-		if (Spotify.SHOULD_CHECK_CONNECTION_BEFORE_REQUEST && !this.IsInternetConnected()) {
-			Throw Exception("No internet connection")
-		}
-		
 		if !(noTimeOut) {
 			this.CheckTimeout()
 		}
@@ -187,21 +179,7 @@ class Util {
 		SpotifyWinHttp.Send(body)
 		
 		if (SpotifyWinHttp.Status > 299 && !noErr) {
-			ErrorObject := JSON.Load(SpotifyWinHttp.ResponseText).Error
-			ErrorMessage := ""
-			
-			if (ErrorObject) {
-				if (ErrorObject.Reason) {
-					ErrorMessage .= ErrorObject.Reason ": "
-				}
-				
-				ErrorMessage .= ErrorObject.Message
-			}
-			else {
-				ErrorMessage := SpotifyWinHttp.Status . " not 2xx for request """ . method . ":" . url . """."
-			}
-			
-			throw {message: ErrorMessage, what: "HTTP response code not 2xx", file: A_LineFile, line: A_LineNumber}
+			throw {message: SpotifyWinHttp.Status . " not 2xx for request """ . method . ":" . url . """.", what: "HTTP response code not 2xx", file: A_LineFile, line: A_LineNumber}
 		}
 		
 		return SpotifyWinHttp.ResponseText
