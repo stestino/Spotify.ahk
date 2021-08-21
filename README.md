@@ -20,8 +20,9 @@ While you can choose not to authorize Spotify.ahk, all functionality will be los
 
 You will only rarely need to do web authorization thanks to Spotify's refreshable user authorization.
 
+# Personalization Changes 
 
-#### Spotify.AHK changes
+#### Spotify.AHK
 1. Modified spotify.ahk to not popup/annoy when token refresh fails. Instead, it now silently sleeps and retries.
 2. Replaced API auth, using an app under my own account.
 3. Replaced plain-text base64 auth with secret stored in environment variable.
