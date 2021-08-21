@@ -71,7 +71,9 @@ class Util {
 	
 	RefreshTempToken(refresh) {
 		refresh := this.DecryptToken(refresh)
-		arg := {1:{1:"Content-Type", 2:"application/x-www-form-urlencoded"}, 2:{1:"Authorization", 2:"Basic OWZlMjYyOTZiYjdiNDMzMGFjNTkzMzllZmQyNzQyYjA6ZWNhNjU2ZDFkNTczNDNhOTllMWJjNWVmODQ0YmY2NGM="}}
+		EnvGet, SPOTIFY_AUTH, SPOTIFY_AUTH
+		
+		arg := {1:{1:"Content-Type", 2:"application/x-www-form-urlencoded"}, 2:{1:"Authorization", 2:"Basic " . SPOTIFY_AUTH}}
 		
 		try {
 			response := this.CustomCall("POST", "https://accounts.spotify.com/api/token?grant_type=refresh_token&refresh_token=" . refresh, arg, true)
@@ -137,7 +139,8 @@ class Util {
 			return
 		}
 		AHKsock_Close(-1)
-		arg := {1:{1:"Content-Type", 2:"application/x-www-form-urlencoded"}, 2:{1:"Authorization", 2:"Basic ZjI2ODJhOTQwMjE0NDViZWEwNDE1MjU2ZWE3NzhjZDI6MjdiMWU3NDk3ZDJjNDIxYTk4MzgyMjEyYWEyZThjM2Y="}}
+		EnvGet, SPOTIFY_AUTH, SPOTIFY_AUTH
+		arg := {1:{1:"Content-Type", 2:"application/x-www-form-urlencoded"}, 2:{1:"Authorization", 2:"Basic " . SPOTIFY_AUTH}}
 		response := this.CustomCall("POST", "https://accounts.spotify.com/api/token?grant_type=authorization_code&code=" . this.auth . "&redirect_uri=http:%2F%2Flocalhost:8000%2Fcallback", arg, true)
 		RegexMatch(response, "access_token"":""\K.*?(?="")", token)
 		this.token := token
