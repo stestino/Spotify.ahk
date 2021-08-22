@@ -28,20 +28,19 @@ You will only rarely need to do web authorization thanks to Spotify's refreshabl
 3. Replaced API auth, using an app under my own account.
 4. Replaced plain-text base64 auth with secret stored in environment variable.
 
-
 #### Playlist Controls
 Implemented a set of playlist controls to my own personal preference.
 
 | Key Combo  | Action |
 | ------------- | ------------- |
-| LShift + Up  | Volume increase by 5% |
-| LShift + Down  | Volume increase by 5%  |
-| LShift + Left  | Volume MUTE |
-| LShift + Right  | Volume MAX  |
+| Volume increase by 5% | LShift + Up |
+| Volume increase by 5% | LShift + Down |
+| Volume MUTE | LShift + Left |
+| Volume MAX  | LShift + Right |
+| Next Track | LCtrl + Right |
+| Last Track | LCtrl + Left |
 
 ## Future Changes / Wishlist
-1. Next Track
-2. Previous Track
-3. Playlist selection 
-4. Re-implement shuffle
+1. Playlist selection 
+2. Re-implement shuffle
 
