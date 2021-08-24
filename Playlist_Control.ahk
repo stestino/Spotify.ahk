@@ -41,12 +41,12 @@ return
 
 ; Next Track
 ^!Right::
-spoofy.Player.NextTrack 
+  spoofy.Player.NextTrack 
 return
 
 ; Last Track
 ^!Left::
-spoofy.Player.LastTrack
+  spoofy.Player.LastTrack
 return
 
 
